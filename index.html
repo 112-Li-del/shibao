@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111417">
+  <title>AI 行业日报</title>
+  <style>
+    :root {
+      --canvas: #090c0a;
+      --surface: #111612;
+      --surface-raised: #172019;
+      --line: rgba(232, 243, 232, 0.1);
+      --text: #eef4ec;
+      --muted: #9aa89d;
+      --lime: #b9ff3d;
+      --aqua: #b8d7c0;
+      --coral: #fa3f7d;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 14px;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * { box-sizing: border-box; }
+
+    .page-shell,
+    .masthead > *,
+    .content-layout > *,
+    .section-head > *,
+    .card-footer > * { min-width: 0; }
+
+    html { background: var(--canvas); }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--text);
+      background:
+        linear-gradient(rgba(185, 255, 61, 0.027) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(185, 255, 61, 0.027) 1px, transparent 1px),
+        var(--canvas);
+      background-size: 42px 42px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    button { font: inherit; }
+
+    .skip-link {
+      position: fixed;
+      z-index: 10;
+      top: -48px;
+      left: 16px;
+      padding: 10px 14px;
+      color: var(--canvas);
+      background: var(--lime);
+      border-radius: var(--radius-sm);
+      transition: top 160ms var(--ease-out);
+    }
+
+    .skip-link:focus { top: 16px; }
+
+    .page-shell {
+      width: min(1380px, 100%);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .top-rule {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .live-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--lime);
+    }
+
+    .live-status::before {
+      width: 7px;
+      height: 7px;
+      content: "";
+      background: var(--coral);
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px rgba(250, 63, 125, 0.15);
+    }
+
+    .masthead {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(290px, 0.7fr);
+      gap: 34px;
+      align-items: end;
+      padding: clamp(44px, 7vw, 92px) 0 34px;
+    }
+
+    .eyebrow,
+    .section-kicker,
+    .priority-tag,
+    .number-mark,
+    .metric-label {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow { color: var(--coral); }
+
+    h1,
+    h2,
+    h3,
+    p { margin: 0; }
+
+    h1 {
+      max-width: 760px;
+      margin-top: 14px;
+      font-size: clamp(48px, 7.4vw, 96px);
+      font-weight: 850;
+      line-height: 0.94;
+      text-wrap: balance;
+    }
+
+    .title-prefix { color: var(--lime); }
+
+    .subtitle {
+      max-width: 31rem;
+      margin-top: 20px;
+      color: #c5d0c7;
+      font-size: clamp(16px, 2vw, 21px);
+      font-weight: 600;
+      line-height: 1.55;
+      text-wrap: pretty;
+    }
+
+    .summary-panel {
+      position: relative;
+      overflow: hidden;
+      padding: 25px;
+      background: var(--surface-raised);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 22px 46px rgba(0, 0, 0, 0.2), inset 0 1px rgba(185, 255, 61, 0.09);
+    }
+
+    .summary-panel::after {
+      position: absolute;
+      right: -28px;
+      bottom: -60px;
+      width: 158px;
+      height: 158px;
+      content: "";
+      background: repeating-linear-gradient(135deg, rgba(185, 255, 61, 0.13) 0 2px, transparent 2px 12px);
+      transform: rotate(8deg);
+    }
+
+    .section-kicker { color: var(--coral); }
+
+    .summary-panel p {
+      position: relative;
+      z-index: 1;
+      margin-top: 14px;
+      max-width: 34ch;
+      color: #dce8dd;
+      font-size: 16px;
+      font-weight: 650;
+      line-height: 1.75;
+      text-wrap: pretty;
+    }
+
+    .summary-meta {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .summary-meta strong {
+      color: var(--lime);
+      font-size: 21px;
+      line-height: 1;
+    }
+
+    .content-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(292px, 318px);
+      gap: 30px;
+      align-items: start;
+    }
+
+    .news-section,
+    .trend-panel {
+      min-width: 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 0 18px;
+    }
+
+    .section-head h2,
+    .trend-title {
+      margin-top: 9px;
+      font-size: 25px;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .count-label {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .news-status {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .reading-progress {
+      padding: 5px 8px;
+      color: #c4efce;
+      background: rgba(185, 255, 61, 0.07);
+      border: 1px solid rgba(185, 255, 61, 0.2);
+      border-radius: var(--radius-sm);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .filter-bar {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 7px;
+      margin-bottom: 16px;
+    }
+
+    .filter-button {
+      display: inline-flex;
+      gap: 7px;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 12px;
+      color: #a6b4a8;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition-property: background-color, color, border-color, transform;
+      transition-duration: 160ms;
+      transition-timing-function: var(--ease-out);
+    }
+
+    .filter-count {
+      display: inline-grid;
+      min-width: 19px;
+      height: 19px;
+      padding: 0 5px;
+      place-items: center;
+      color: #c9d8ca;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .filter-button[aria-pressed="true"] {
+      color: #17200a;
+      background: var(--lime);
+      border-color: var(--lime);
+      font-weight: 750;
+    }
+
+    .filter-button[aria-pressed="true"] .filter-count {
+      color: #2c3a0f;
+      background: rgba(23, 32, 11, 0.16);
+    }
+
+    .filter-button:active,
+    .complete-button:active { transform: scale(0.96); }
+
+    .news-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .news-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 298px;
+      padding: 23px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.032);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      transition-property: border-color, background-color, transform;
+      transition-duration: 180ms;
+      transition-timing-function: var(--ease-out);
+    }
+
+    .news-card.featured {
+      grid-column: 1 / -1;
+      min-height: 350px;
+      background: #151d17;
+      border-color: rgba(185, 255, 61, 0.34);
+      box-shadow: inset 0 1px rgba(185, 255, 61, 0.12), 0 18px 36px rgba(0, 0, 0, 0.2);
+    }
+
+    .news-card.featured::before {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 48%;
+      height: 100%;
+      content: "";
+      background:
+        repeating-linear-gradient(90deg, transparent 0 23px, rgba(185, 255, 61, 0.08) 23px 24px),
+        repeating-linear-gradient(0deg, transparent 0 23px, rgba(185, 255, 61, 0.06) 23px 24px),
+        linear-gradient(135deg, transparent 0 45%, rgba(250, 63, 125, 0.2) 45% 46%, transparent 46% 100%);
+      pointer-events: none;
+    }
+
+    .news-card.featured::after {
+      position: absolute;
+      right: 22px;
+      bottom: -28px;
+      content: "01";
+      color: rgba(185, 255, 61, 0.09);
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: clamp(150px, 20vw, 270px);
+      font-style: italic;
+      line-height: 1;
+      letter-spacing: -0.08em;
+      pointer-events: none;
+    }
+
+    .news-card[hidden] { display: none; }
+
+    .card-topline {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .priority-tag {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--coral);
+    }
+
+    .priority-tag.medium { color: #b7c7b9; }
+
+    .priority-tag::before {
+      width: 8px;
+      height: 8px;
+      content: "";
+      background: currentColor;
+      border-radius: 50%;
+    }
+
+    .complete-mark {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      color: #142008;
+      background: var(--lime);
+      border-radius: var(--radius-sm);
+      font-size: 16px;
+      font-weight: 900;
+      opacity: 0;
+      transform: scale(0.35);
+      transition-property: opacity, transform;
+      transition-duration: 180ms;
+      transition-timing-function: var(--ease-out);
+    }
+
+    .is-complete .complete-mark {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .news-card.is-complete {
+      background: #162718;
+      border-color: rgba(185, 255, 61, 0.46);
+    }
+
+    .news-card.featured.is-complete {
+      background: #1b301c;
+      border-color: var(--lime);
+    }
+
+    .is-complete .number-mark { color: var(--lime); }
+
+    .number-mark {
+      position: relative;
+      z-index: 1;
+      margin-top: 30px;
+      color: rgba(241, 244, 239, 0.36);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .featured .number-mark { color: var(--lime); }
+
+    .news-card h3 {
+      position: relative;
+      z-index: 1;
+      max-width: 22ch;
+      margin-top: 10px;
+      font-size: clamp(21px, 2.2vw, 29px);
+      font-weight: 780;
+      line-height: 1.22;
+      text-wrap: balance;
+    }
+
+    .featured h3 {
+      max-width: 20ch;
+      font-size: clamp(30px, 3.3vw, 45px);
+      line-height: 1.1;
+    }
+
+    .news-card p {
+      position: relative;
+      z-index: 1;
+      max-width: 51ch;
+      margin-top: 13px;
+      color: #aeb9b0;
+      font-size: 14px;
+      line-height: 1.7;
+      text-wrap: pretty;
+    }
+
+    .card-footer {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 22px;
+    }
+
+    .card-meta {
+      color: #8f9e91;
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .complete-button {
+      min-width: 108px;
+      min-height: 42px;
+      padding: 0 15px;
+      color: #142008;
+      background: var(--lime);
+      border: 1px solid var(--lime);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 750;
+      touch-action: manipulation;
+      transition-property: color, background-color, border-color, transform;
+      transition-duration: 160ms;
+      transition-timing-function: var(--ease-out);
+    }
+
+    .is-complete .complete-button {
+      color: #c2edc7;
+      background: rgba(185, 255, 61, 0.08);
+      border-color: rgba(185, 255, 61, 0.45);
+    }
+
+    .trend-panel {
+      position: sticky;
+      top: 18px;
+      padding: 21px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      box-shadow: inset 0 2px var(--coral);
+    }
+
+    .trend-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .trend-date {
+      color: #91a092;
+      font-size: 12px;
+      line-height: 1.4;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .pulse-chart {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 7px;
+      align-items: end;
+      height: 128px;
+      margin: 26px 0 20px;
+      padding: 12px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: repeating-linear-gradient(to bottom, transparent 0 31px, rgba(231, 244, 232, 0.055) 31px 32px);
+    }
+
+    .pulse-bar {
+      display: block;
+      min-height: 16px;
+      background: #769a75;
+      border-radius: 2px 2px 0 0;
+      box-shadow: 0 -4px 16px rgba(185, 255, 61, 0.08);
+    }
+
+    .pulse-bar.highlight { background: var(--lime); }
+
+    .trend-list {
+      display: grid;
+      gap: 15px;
+    }
+
+    .trend-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .trend-row + .trend-row { padding-top: 15px; border-top: 1px solid var(--line); }
+
+    .trend-name {
+      color: #e0e9e0;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .metric-label {
+      display: block;
+      margin-top: 5px;
+      color: #8e9b90;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+    }
+
+    .trend-value {
+      color: var(--lime);
+      font-size: 19px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .trend-value.coral { color: var(--coral); }
+    .trend-value.aqua { color: #c4e5ca; }
+
+    .source-note {
+      margin-top: 24px;
+      color: #738274;
+      font-size: 11px;
+      line-height: 1.55;
+    }
+
+    @media (hover: hover) {
+      .filter-button:hover { color: var(--text); border-color: rgba(185, 255, 61, 0.55); }
+      .filter-button[aria-pressed="true"]:hover { color: #17200b; background: #c9ff6f; }
+      .news-card:hover { transform: translateY(-3px); border-color: rgba(241, 244, 239, 0.22); }
+      .news-card.featured:hover { border-color: var(--lime); }
+      .complete-button:hover { background: #c9ff6f; }
+      .is-complete .complete-button:hover { color: #142008; background: var(--lime); }
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid var(--coral);
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 820px) {
+      .masthead { grid-template-columns: 1fr; gap: 24px; }
+      .summary-panel { max-width: 620px; }
+      .content-layout { grid-template-columns: 1fr; }
+      .trend-panel { position: static; }
+    }
+
+    @media (max-width: 560px) {
+      body { overflow-x: hidden; }
+      .page-shell { width: 100%; max-width: 100%; padding: 16px; }
+      .top-rule { padding-bottom: 14px; }
+      .top-rule > span:last-child { display: none; }
+      .masthead { padding: 42px 0 26px; }
+      h1 {
+        max-width: 100%;
+        font-size: clamp(38px, 13vw, 56px);
+        overflow-wrap: anywhere;
+      }
+      .subtitle { max-width: 26ch; }
+      .summary-panel { max-width: 100%; padding: 20px; }
+      .content-layout { gap: 18px; }
+      .section-head { align-items: flex-start; flex-wrap: wrap; gap: 10px; }
+      .section-head h2 { font-size: 22px; }
+      .news-status { width: 100%; justify-content: space-between; }
+      .filter-bar { gap: 6px; }
+      .filter-button { gap: 4px; padding: 0 6px; font-size: 12px; white-space: nowrap; }
+      .filter-count { min-width: 18px; padding: 0 4px; }
+      .news-list { grid-template-columns: 1fr; gap: 12px; }
+      .news-card,
+      .news-card.featured { grid-column: auto; min-height: 292px; padding: 20px; }
+      .news-card.featured::after { right: 10px; bottom: -12px; font-size: 144px; }
+      .featured h3 { max-width: 100%; font-size: 29px; }
+      .news-card h3,
+      .news-card p { max-width: 100%; overflow-wrap: anywhere; }
+      .news-card h3 { font-size: 23px; }
+      .card-footer { display: grid; grid-template-columns: 1fr; align-items: stretch; }
+      .card-meta { line-height: 1.5; }
+      .complete-button { width: 100%; min-width: 0; }
+      .trend-panel { padding: 20px; }
+    }
+
+    @media (max-width: 374px) {
+      .page-shell { padding: 14px; }
+      h1 { font-size: 42px; }
+      .filter-button { font-size: 11px; }
+      .filter-count { font-size: 10px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到日报内容</a>
+
+  <main id="main-content" class="page-shell">
+    <div class="top-rule">
+      <span class="live-status">日报更新中</span>
+      <span>2026.09.16 / 星期三 / 早间版</span>
+    </div>
+
+    <header class="masthead">
+      <div>
+        <p class="eyebrow">AI DAILY BRIEFING / SIGNAL EDITION</p>
+        <h1><span class="title-prefix">AI</span> 行业日报</h1>
+        <p class="subtitle">5分钟看懂今天AI圈发生了什么。</p>
+      </div>
+
+      <section class="summary-panel" aria-labelledby="summary-title">
+        <span id="summary-title" class="section-kicker">今日重点摘要</span>
+        <p>模型正从“更会回答”转向“真正完成任务”。能力、推理成本和企业工作流，正在同时改写下一阶段的竞争节奏。</p>
+        <div class="summary-meta"><strong>03</strong><span>条值得优先关注的行业信号</span></div>
+      </section>
+    </header>
+
+    <div class="content-layout">
+      <section class="news-section" aria-labelledby="news-title">
+        <div class="section-head">
+          <div>
+            <span class="section-kicker">Editor’s picks</span>
+            <h2 id="news-title">今日新闻</h2>
+          </div>
+          <div class="news-status" aria-live="polite">
+            <span id="reading-progress" class="reading-progress">已读 0 / 3</span>
+            <span id="visible-count" class="count-label">显示 3 条</span>
+          </div>
+        </div>
+
+        <div class="filter-bar" aria-label="按新闻重要程度筛选">
+          <button class="filter-button" type="button" data-filter="all" aria-pressed="true">全部 <span class="filter-count" data-filter-count="all">3</span></button>
+          <button class="filter-button" type="button" data-filter="high" aria-pressed="false">高优先级 <span class="filter-count" data-filter-count="high">2</span></button>
+          <button class="filter-button" type="button" data-filter="medium" aria-pressed="false">中优先级 <span class="filter-count" data-filter-count="medium">1</span></button>
+        </div>
+
+        <div class="news-list">
+          <article class="news-card featured" data-priority="high">
+            <div class="card-topline">
+              <span class="priority-tag">高优先级</span>
+              <span class="complete-mark" aria-label="已完成阅读">✓</span>
+            </div>
+            <span class="number-mark">01 / 模型观察</span>
+            <h3>多模态代理，开始从回答问题走向完成任务</h3>
+            <p>新一轮产品重点不再只是展示理解能力，而是把检索、规划、调用工具和复盘收进同一条任务链路。</p>
+            <div class="card-footer">
+              <span class="card-meta">阅读 2 分钟 · 演示内容</span>
+              <button class="complete-button" type="button" aria-pressed="false">阅读完成</button>
+            </div>
+          </article>
+
+          <article class="news-card" data-priority="high">
+            <div class="card-topline">
+              <span class="priority-tag">高优先级</span>
+              <span class="complete-mark" aria-label="已完成阅读">✓</span>
+            </div>
+            <span class="number-mark">02 / 算力焦点</span>
+            <h3>推理成本继续下探，端侧部署加速</h3>
+            <p>模型压缩和硬件协同让更多高频能力从云端走向终端，产品体验开始重新分层。</p>
+            <div class="card-footer">
+              <span class="card-meta">阅读 1 分钟 · 演示内容</span>
+              <button class="complete-button" type="button" aria-pressed="false">阅读完成</button>
+            </div>
+          </article>
+
+          <article class="news-card" data-priority="medium">
+            <div class="card-topline">
+              <span class="priority-tag medium">中优先级</span>
+              <span class="complete-mark" aria-label="已完成阅读">✓</span>
+            </div>
+            <span class="number-mark">03 / 企业落地</span>
+            <h3>AI 评估，进入日常交付流程</h3>
+            <p>企业不再只看模型演示效果，开始用质量、成本与稳定性指标管理每次上线。</p>
+            <div class="card-footer">
+              <span class="card-meta">阅读 2 分钟 · 演示内容</span>
+              <button class="complete-button" type="button" aria-pressed="false">阅读完成</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <aside class="trend-panel" aria-labelledby="trend-title">
+        <div class="trend-head">
+          <div>
+            <span class="section-kicker">Signal board</span>
+            <h2 id="trend-title" class="trend-title">今日趋势</h2>
+          </div>
+          <span class="trend-date">09 / 15<br>早间信号</span>
+        </div>
+
+        <div class="pulse-chart" aria-label="今日行业关注度走势，下午时段为峰值">
+          <span class="pulse-bar" style="height: 28%"></span>
+          <span class="pulse-bar" style="height: 44%"></span>
+          <span class="pulse-bar" style="height: 38%"></span>
+          <span class="pulse-bar" style="height: 64%"></span>
+          <span class="pulse-bar highlight" style="height: 88%"></span>
+          <span class="pulse-bar" style="height: 57%"></span>
+          <span class="pulse-bar" style="height: 72%"></span>
+        </div>
+
+        <div class="trend-list">
+          <div class="trend-row">
+            <div><span class="trend-name">智能体工作流</span><span class="metric-label">讨论热度</span></div>
+            <span class="trend-value">+24</span>
+          </div>
+          <div class="trend-row">
+            <div><span class="trend-name">端侧推理</span><span class="metric-label">产品关注</span></div>
+            <span class="trend-value aqua">+18</span>
+          </div>
+          <div class="trend-row">
+            <div><span class="trend-name">模型安全评估</span><span class="metric-label">增长速度</span></div>
+            <span class="trend-value coral">+11</span>
+          </div>
+        </div>
+        <p class="source-note">趋势数据为界面演示样例，可在 HTML 中替换为你的真实日报数据。</p>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const cards = Array.from(document.querySelectorAll('.news-card'));
+      const filterButtons = Array.from(document.querySelectorAll('.filter-button'));
+      const filterCounts = Array.from(document.querySelectorAll('[data-filter-count]'));
+      const visibleCount = document.querySelector('#visible-count');
+      const readingProgress = document.querySelector('#reading-progress');
+
+      function updateFilterCounts() {
+        filterCounts.forEach((filterCount) => {
+          const filter = filterCount.dataset.filterCount;
+          const count = filter === 'all'
+            ? cards.length
+            : cards.filter((card) => card.dataset.priority === filter).length;
+          filterCount.textContent = count;
+        });
+      }
+
+      function updateNewsStatus() {
+        const count = cards.filter((card) => !card.hidden).length;
+        const completedCount = cards.filter((card) => card.classList.contains('is-complete')).length;
+        visibleCount.textContent = `显示 ${count} 条`;
+        readingProgress.textContent = `已读 ${completedCount} / ${cards.length}`;
+      }
+
+      document.querySelectorAll('.complete-button').forEach((button) => {
+        button.addEventListener('click', () => {
+          const card = button.closest('.news-card');
+          const isComplete = card.classList.toggle('is-complete');
+          button.textContent = isComplete ? '已完成' : '阅读完成';
+          button.setAttribute('aria-pressed', String(isComplete));
+          updateNewsStatus();
+        });
+      });
+
+      filterButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const selectedFilter = button.dataset.filter;
+
+          filterButtons.forEach((filterButton) => {
+            filterButton.setAttribute('aria-pressed', String(filterButton === button));
+          });
+
+          cards.forEach((card) => {
+            card.hidden = selectedFilter !== 'all' && card.dataset.priority !== selectedFilter;
+          });
+
+          updateNewsStatus();
+        });
+      });
+
+      updateFilterCounts();
+      updateNewsStatus();
+    })();
+  </script>
+</body>
+</html>
